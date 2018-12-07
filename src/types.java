@@ -40,15 +40,16 @@ class MainNode implements Node {
         return prog.removeFirst();
     }
 
+    private Node buildSequence() {
+        Node node = prog.removeLast();
+        if (prog.isEmpty())
+            return node;
+        return new SequenceNode(node, buildSequence());
+    }
+
     @Override
     public String show() {
-        StringBuilder builder = new StringBuilder();
-        while (!prog.isEmpty()) {
-            Node stmt = prog.removeLast();
-            builder.append(stmt.show());
-        }
-
-        return "<MainNode>\n" + Parser.addNewline(builder.toString());
+        return "<MainNode>\n" + Parser.addNewline(buildSequence().show());
     }
 
     @Override
@@ -102,7 +103,7 @@ class VarNode implements Node, Comparable {
 
     @Override
     public String show() {
-        return "<VarNode> " + var + "\n";
+        return "<VariableNode> " + var + "\n";
     }
 
     @Override
@@ -324,7 +325,7 @@ class SequenceNode implements Node {
     private Node stmt1;
     private Node stmt2;
 
-    private SequenceNode(Node stmt1, Node stmt2) {
+    SequenceNode(Node stmt1, Node stmt2) {
         this.stmt1 = stmt1;
         this.stmt2 = stmt2;
     }

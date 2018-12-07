@@ -1,5 +1,6 @@
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Scanner;
 
 public class Parser {
@@ -15,10 +16,12 @@ public class Parser {
     }
 
     public static void main(String[] args) throws IOException {
-        ImpLexer l = new ImpLexer(new FileReader("test"));
+        ImpLexer l = new ImpLexer(new FileReader("input"));
 
         l.yylex();
 
-        System.out.println(l.main.show());
+        PrintWriter writer = new PrintWriter("arbore", "UTF-8");
+        writer.print(l.main.show());
+        writer.close();
     }
 }
