@@ -252,85 +252,95 @@ class ImpLexer {
   private int zzFinalHighSurrogate = 0;
 
   /* user code: */
-  	private TreeSet<VarNode> vars = new TreeSet<>();
+    private TreeSet<VarNode> vars = new TreeSet<>();
     private boolean varList = false;
     MainNode main = new MainNode();
-    private Deque<Node> deque = new LinkedList<>();
+    private LinkedList<Node> list = new LinkedList<>();
 
-    /*
-    Get data from inside the brackets.
-    */
-    private Deque<Node> getBracketContent(Deque<Node> deque) {
-        Deque<Node> content = new LinkedList<>();
+    private Node buildStmt(List<Node> list) {
+        // Mind operator precedence
 
-        Node curr = deque.pollFirst();
-        assert (curr instanceof Symbol);
-        String open = ((Symbol)curr).get(), close;
-        if (open.equals("(")) {
-            close = ")";
-        } else {
-            assert (open.equals("{"));
-            close = "}";
+        // Brackets
+        Symbol openSym = new Symbol("(");
+        Symbol closeSym = new Symbol(")");
+        int open = list.indexOf(openSym);
+        while (open != -1) {
+            int close = list.indexOf(closeSym);
+            Node bracketNode = new BracketNode(buildStmt(list.subList(open + 1, close)));
+
+            // Remove leftover brackets
+            list.remove(open);
+            list.remove(open);
+
+            list.add(open, bracketNode);
+            open = list.indexOf(openSym);
         }
 
-        curr = deque.pollFirst();
-        while (!(curr instanceof Symbol) || !((Symbol)curr).get().equals(close)) {
-            content.add(curr);
-            curr = deque.pollFirst();
+        // Not
+        Symbol notSym = new Symbol("!");
+        int not = list.indexOf(notSym);
+        while (not != -1) {
+            Node notNode = new NotNode(list.get(not + 1));
+            list.subList(not, not + 2).clear();
+            list.add(not, notNode);
+            not = list.indexOf(notSym);
         }
-        return content;
-    }
 
-    private Node buildStmt(Deque<Node> deque) throws IOException{
-        Node curr = deque.peek();
-
-        if (curr instanceof Symbol) {
-            String symbol = ((Symbol)curr).get();
-            switch(symbol) {
-                case "!":
-                    deque.pollFirst();
-                    Node bExpr;
-                    Node peek = deque.peek();
-                    if (peek instanceof Symbol) {
-                      String bracket = ((Symbol)peek).get();
-                      if (!bracket.equals("("))
-                          throw new IOException("'!' can only be followed by a BVal or '('.");
-                      else
-                          bExpr = buildStmt(getBracketContent(deque));
-
-                    } else if (peek instanceof BoolNode) {
-                        bExpr = deque.pollFirst();
-                    } else {
-                        throw new IOException("'!' can only be followed by a BVal or '('.");
-                    }
-                    return new NotNode(bExpr);
-
-                case "(":
-                    Node expr = buildStmt(getBracketContent(deque));
-                    return new BracketNode(expr);
-                case "+":
-                case "/":
-                case "&&":
-                case ">":
-                case "=":
-                    deque.pollFirst();
-                    Node e1 = main.popStmt();
-                    Node e2 = buildStmt(deque);
-                    switch(symbol){
-                        case "+": return new PlusNode(e1, e2);
-                        case "/": return new DivNode(e1, e2);
-                        case "&&": return new AndNode(e1, e2);
-                        case ">": return new GreaterNode(e1, e2);
-                        case "=": return new AssignmentNode(e1, e2);
-                    }
-                default:
-                    throw new IOException("Invalid symbol " + symbol + "\n");
-            }
-
-        } else {
-            deque.pollFirst();
-            return curr;
+        // Div
+        Symbol divSym = new Symbol("/");
+        int div = list.indexOf(divSym);
+        while (div != -1) {
+            Node divNode = new DivNode(list.get(div - 1), list.get(div + 1));
+            list.subList(div - 1, div + 2).clear();
+            list.add(div - 1, divNode);
+            div = list.indexOf(divSym);
         }
+
+        // Plus
+        Symbol plusSym = new Symbol("+");
+        int plus = list.indexOf(plusSym);
+        while (plus != -1) {
+            Node plusNode = new PlusNode(list.get(plus - 1), list.get(plus + 1));
+            list.subList(plus - 1, plus + 2).clear();
+            list.add(plus - 1, plusNode);
+            plus = list.indexOf(plusSym);
+        }
+
+
+        // Greater
+        Symbol greaterSym = new Symbol(">");
+        int greater = list.indexOf(greaterSym);
+        while (greater != -1) {
+            Node greaterNode = new GreaterNode(list.get(greater - 1), list.get(greater + 1));
+            list.subList(greater - 1, greater + 2).clear();
+            list.add(greater - 1, greaterNode);
+            greater = list.indexOf(greaterSym);
+        }
+
+        // And
+        Symbol andSym = new Symbol("&&");
+        int and = list.indexOf(andSym);
+        while (and != -1) {
+            Node andNode = new AndNode(list.get(and - 1), list.get(and + 1));
+            list.subList(and - 1, and + 2).clear();
+            list.add(and - 1, andNode);
+            and = list.indexOf(andSym);
+        }
+
+        // Assignment
+        Symbol assignSym = new Symbol("=");
+        int assign = list.indexOf(assignSym);
+        while (assign != -1) {
+            Node assignNode = new AssignmentNode(list.get(assign - 1), list.get(assign + 1));
+            list.subList(assign - 1, assign + 2).clear();
+            list.add(assign - 1, assignNode);
+            assign = list.indexOf(assignSym);
+        }
+
+        assert (list.size() == 1);
+        Node stmt = list.get(0);
+        list.clear();
+        return stmt;
     }
 
 
@@ -710,59 +720,59 @@ class ImpLexer {
             if (varList)
                 vars.add(var);
             else
-                deque.addLast(var);
+                list.addLast(var);
              if (!vars.contains(var))
                  System.out.println("UnassignedVar");
             } 
             // fall through
           case 21: break;
           case 3: 
-            { deque.addLast(new IntNode(yytext()));
+            { list.addLast(new IntNode(yytext()));
             } 
             // fall through
           case 22: break;
           case 4: 
-            { deque.addLast(new Symbol("+"));
+            { list.addLast(new Symbol("+"));
             } 
             // fall through
           case 23: break;
           case 5: 
-            { deque.addLast(new Symbol("/"));
+            { list.addLast(new Symbol("/"));
             } 
             // fall through
           case 24: break;
           case 6: 
-            { deque.addLast(new Symbol("("));
+            { list.addLast(new Symbol("("));
             } 
             // fall through
           case 25: break;
           case 7: 
-            { deque.addLast(new Symbol(")"));
+            { list.addLast(new Symbol(")"));
             } 
             // fall through
           case 26: break;
           case 8: 
-            { deque.addLast(new Symbol(">"));
+            { list.addLast(new Symbol(">"));
             } 
             // fall through
           case 27: break;
           case 9: 
-            { deque.addLast(new Symbol("!"));
+            { list.addLast(new Symbol("!"));
             } 
             // fall through
           case 28: break;
           case 10: 
-            { deque.addLast(new Symbol("{"));
+            { list.addLast(new Symbol("{"));
             } 
             // fall through
           case 29: break;
           case 11: 
-            { deque.addLast(new Symbol("}"));
+            { list.addLast(new Symbol("}"));
             } 
             // fall through
           case 30: break;
           case 12: 
-            { deque.addLast(new Symbol("="));
+            { list.addLast(new Symbol("="));
             } 
             // fall through
           case 31: break;
@@ -770,21 +780,18 @@ class ImpLexer {
             { if (varList) {
                  varList = false;
              } else {
-                 while (!deque.isEmpty()) {
-                     Node stmt = buildStmt(deque); // removing deque elements creating the statement
-                     main.pushStmt(stmt);
-                 }
+                 main.pushStmt(buildStmt(list));
              }
             } 
             // fall through
           case 32: break;
           case 14: 
-            { deque.addLast(new Symbol("&&"));
+            { list.addLast(new Symbol("&&"));
             } 
             // fall through
           case 33: break;
           case 15: 
-            { deque.addLast(new Symbol("if"));
+            { list.addLast(new Symbol("if"));
             } 
             // fall through
           case 34: break;
@@ -794,17 +801,17 @@ class ImpLexer {
             // fall through
           case 35: break;
           case 17: 
-            { deque.addLast(new BoolNode(yytext()));
+            { list.addLast(new BoolNode(yytext()));
             } 
             // fall through
           case 36: break;
           case 18: 
-            { deque.addLast(new Symbol("else"));
+            { list.addLast(new Symbol("else"));
             } 
             // fall through
           case 37: break;
           case 19: 
-            { deque.addLast(new Symbol("while"));
+            { list.addLast(new Symbol("while"));
             } 
             // fall through
           case 38: break;

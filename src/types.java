@@ -19,6 +19,18 @@ class Symbol implements Node {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Symbol)
+            return ((Symbol)obj).symbol.equals(symbol);
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return symbol;
+    }
+
+    @Override
     public String show() {
         return null;
     }
@@ -66,6 +78,11 @@ class IntNode implements Node {
     }
 
     @Override
+    public String toString() {
+        return Integer.toString(number);
+    }
+
+    @Override
     public String show() {
         return "<IntNode> " + number + "\n";
     }
@@ -84,6 +101,11 @@ class BoolNode implements Node {
     }
 
     @Override
+    public String toString() {
+        return (bool ? "True" : "False");
+    }
+
+    @Override
     public String show() {
         return "<BoolNode> " + (bool ? "True" : "False") + "\n";
     }
@@ -99,6 +121,11 @@ class VarNode implements Node, Comparable {
 
     public VarNode(String var) {
         this.var = var;
+    }
+
+    @Override
+    public String toString() {
+        return var;
     }
 
     @Override
