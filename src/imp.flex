@@ -101,7 +101,7 @@ import java.io.IOException;
 
 Var = [a-z]+
 AVal = [1-9][0-9]* | 0
-BVal = "True"|"False"
+BVal = "true"|"false"
 Plus = "+"
 Div = "/"
 OpenPar = "("

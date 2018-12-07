@@ -97,17 +97,17 @@ class BoolNode implements Node {
     private boolean bool;
 
     public BoolNode(String bool) {
-        this.bool = bool.equalsIgnoreCase("True");
+        this.bool = bool.equalsIgnoreCase("true");
     }
 
     @Override
     public String toString() {
-        return (bool ? "True" : "False");
+        return (bool ? "true" : "false");
     }
 
     @Override
     public String show() {
-        return "<BoolNode> " + (bool ? "True" : "False") + "\n";
+        return "<BoolNode> " + (bool ? "true" : "false") + "\n";
     }
 
     @Override
