@@ -29,7 +29,7 @@ import java.io.IOException;
         }
 
         curr = deque.pollFirst();
-        while (!(curr instanceof Symbol) || ((Symbol)curr).get().equals(close)) {
+        while (!(curr instanceof Symbol) || !((Symbol)curr).get().equals(close)) {
             content.add(curr);
             curr = deque.pollFirst();
         }
@@ -79,7 +79,7 @@ import java.io.IOException;
                         case "=": return new AssignmentNode(e1, e2);
                     }
                 default:
-                    throw new IOException("Statement can only start with '!' or '('.");
+                    throw new IOException("Invalid symbol " + symbol + "\n");
             }
 
         } else {
