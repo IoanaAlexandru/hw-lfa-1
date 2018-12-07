@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
 
@@ -67,7 +66,7 @@ class IntNode implements Node {
 
     @Override
     public String show() {
-        return "<IntNode> " + number;
+        return "<IntNode> " + number + "\n";
     }
 
     @Override
@@ -85,7 +84,7 @@ class BoolNode implements Node {
 
     @Override
     public String show() {
-        return "<BoolNode> " + (bool ? "True" : "False");
+        return "<BoolNode> " + (bool ? "True" : "False") + "\n";
     }
 
     @Override
@@ -103,7 +102,7 @@ class VarNode implements Node, Comparable {
 
     @Override
     public String show() {
-        return "<VarNode> " + var;
+        return "<VarNode> " + var + "\n";
     }
 
     @Override
@@ -128,7 +127,7 @@ class PlusNode implements Node {
 
     @Override
     public String show() {
-        String print = aExpr1.show() + "\n" + aExpr2.show();
+        String print = aExpr1.show() + aExpr2.show();
 
         return "<PlusNode> +\n" + Parser.addNewline(print);
     }
@@ -150,7 +149,7 @@ class DivNode implements Node {
 
     @Override
     public String show() {
-        String print = aExpr1.show() + "\n" + aExpr2.show();
+        String print = aExpr1.show() + aExpr2.show();
 
         return "<DivNode> /\n" + Parser.addNewline(print);
     }
@@ -190,7 +189,7 @@ class AndNode implements Node {
 
     @Override
     public String show() {
-        String print = bExpr1.show() + "\n" + bExpr2.show();
+        String print = bExpr1.show() + bExpr2.show();
 
         return "<AndNode> &&\n" + Parser.addNewline(print);
     }
@@ -212,7 +211,7 @@ class GreaterNode implements Node {
 
     @Override
     public String show() {
-        String print = aExpr1.show() + "\n" + aExpr2.show();
+        String print = aExpr1.show() + aExpr2.show();
 
         return "<GreaterNode> >\n" + Parser.addNewline(print);
     }
@@ -252,7 +251,7 @@ class AssignmentNode implements Node {
 
     @Override
     public String show() {
-        String print = var.show() + "\n" + aExpr.show();
+        String print = var.show() + aExpr.show();
 
         return "<AssignmentNode> =\n" + Parser.addNewline(print);
     }
@@ -293,7 +292,7 @@ class IfNode implements Node {
 
     @Override
     public String show() {
-        String print = condition.show() + "\n" + ifBlock.show() + "\n" + elseBlock.show();
+        String print = condition.show() + ifBlock.show() + elseBlock.show();
 
         return "<IfNode> if\n" + Parser.addNewline(print);
     }
@@ -310,7 +309,7 @@ class WhileNode implements Node {
 
     @Override
     public String show() {
-        String print = contition.show() + "\n" + block.show();
+        String print = contition.show() + block.show();
 
         return "<WhileNode> while\n" + Parser.addNewline(print);
     }
@@ -332,7 +331,7 @@ class SequenceNode implements Node {
 
     @Override
     public String show() {
-        String print = stmt1.show() + "\n" + stmt2.show();
+        String print = stmt1.show() + stmt2.show();
 
         return "<SequenceNode>\n" + Parser.addNewline(print);
     }
