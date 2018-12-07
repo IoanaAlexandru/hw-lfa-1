@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Deque;
+import java.util.LinkedList;
 
 interface Node {
     String show();
@@ -29,16 +31,21 @@ class Symbol implements Node {
 }
 
 class MainNode implements Node {
-    private ArrayList<Node> prog = new ArrayList<>();
+    private Deque<Node> prog = new LinkedList<>();
 
-    void addStmt(Node stmt) {
-        prog.add(stmt);
+    void pushStmt(Node stmt) {
+        prog.addFirst(stmt);
+    }
+
+    Node popStmt() {
+        return prog.removeFirst();
     }
 
     @Override
     public String show() {
         StringBuilder builder = new StringBuilder();
-        for (Node stmt : prog) {
+        while (!prog.isEmpty()) {
+            Node stmt = prog.removeLast();
             builder.append(stmt.show());
         }
 
