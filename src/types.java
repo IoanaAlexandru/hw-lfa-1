@@ -7,6 +7,18 @@ interface Node {
     Node interpret();
 }
 
+interface InstructionNode extends Node {
+    void openBlock();
+
+    void closeBlock();
+
+    void setCondition(Node condition);
+
+    void addStmt(Node stmt);
+
+    boolean done();
+}
+
 class Symbol implements Node {
     private String symbol;
 
@@ -21,7 +33,7 @@ class Symbol implements Node {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Symbol)
-            return ((Symbol)obj).symbol.equals(symbol);
+            return ((Symbol) obj).symbol.equals(symbol);
         return false;
     }
 
@@ -41,48 +53,16 @@ class Symbol implements Node {
     }
 }
 
-class Block {
-    Deque<Node> stmts = new LinkedList<>();
-
-    void pushStmt(Node stmt) {
-        stmts.addFirst(stmt);
-    }
-
-    Node popStmt() {
-        return stmts.removeFirst();
-    }
-
-    void clear() {
-        stmts.clear();
-    }
-
-    BlockNode buildNode() {
-        if (stmts.isEmpty())
-            return new BlockNode();
-        if (stmts.size() == 1)
-            return new BlockNode(stmts.getFirst());
-        return new BlockNode(buildSequence());
-    }
-
-    Node buildSequence() {
-        Node node = stmts.removeLast();
-        if (stmts.isEmpty())
-            return node;
-        return new SequenceNode(node, buildSequence());
-    }
-
-}
-
 class MainNode implements Node {
-    private Block block;
+    private Node prog;
 
-    public MainNode(Block block) {
-        this.block = block;
+    public MainNode(Node prog) {
+        this.prog = prog;
     }
 
     @Override
     public String show() {
-        return "<MainNode>\n" + Parser.addNewline(block.buildSequence().show());
+        return "<MainNode>\n" + Parser.addNewline(prog.show());
     }
 
     @Override
@@ -312,37 +292,116 @@ class AssignmentNode implements Node {
 }
 
 class BlockNode implements Node {
-    private Node stmt;
+    private Deque<Node> stmts = new LinkedList<>();
 
-    public BlockNode() {
-        stmt = null;
+    void pushStmt(Node stmt) {
+        stmts.addFirst(stmt);
     }
 
-    public BlockNode(Node stmt) {
-        this.stmt = stmt;
+    Node popStmt() {
+        return stmts.removeFirst();
+    }
+
+    void clear() {
+        stmts.clear();
+    }
+
+    Node getStmt() {
+        if (stmts.isEmpty())
+            return null;
+        if (stmts.size() == 1)
+            return stmts.getFirst();
+        return buildSequence();
+    }
+
+    private Node buildSequence() {
+        Node node = stmts.removeLast();
+        if (stmts.isEmpty())
+            return node;
+        return new SequenceNode(node, buildSequence());
     }
 
     @Override
     public String show() {
+        Node stmt = getStmt();
         String blockNode = "<BlockNode> {}\n";
         return stmt == null ? blockNode : blockNode + Parser.addNewline(stmt.show());
     }
 
     @Override
     public Node interpret() {
-        return stmt.interpret();
+        return getStmt().interpret();
     }
 }
 
-class IfNode implements Node {
+class IfNode implements InstructionNode {
     private Node condition;
-    private Node ifBlock;
-    private Node elseBlock;
+    private BlockNode ifBlock;
+    private BlockNode elseBlock;
+    private boolean ifBlockOpen = false;
+    private boolean elseBlockOpen = false;
+    private boolean ifDone = false;
+    private boolean elseDone = false;
 
-    public IfNode(Node condition, Node ifBlock, Node elseBlock) {
+    public IfNode() {
+        condition = null;
+        ifBlock = new BlockNode();
+        elseBlock = new BlockNode();
+    }
+
+    public IfNode(Node condition) {
+        this.condition = condition;
+        ifBlock = new BlockNode();
+        elseBlock = new BlockNode();
+    }
+
+    public IfNode(Node condition, BlockNode ifBlock, BlockNode elseBlock) {
         this.condition = condition;
         this.ifBlock = ifBlock;
         this.elseBlock = elseBlock;
+    }
+
+    @Override
+    public void openBlock() {
+        if (done()) return;
+
+        if (ifDone)
+            elseBlockOpen = true;
+        else
+            ifBlockOpen = true;
+    }
+
+    @Override
+    public void closeBlock() {
+        if (done()) return;
+
+        if (ifBlockOpen) {
+            ifBlockOpen = false;
+            ifDone = true;
+        } else if (elseBlockOpen) {
+            elseBlockOpen = false;
+            elseDone = true;
+        }
+    }
+
+    @Override
+    public void setCondition(Node condition) {
+        this.condition = condition;
+    }
+
+    @Override
+    public void addStmt(Node stmt) {
+        if (done()) return;
+
+        if (ifBlockOpen)
+            ifBlock.pushStmt(stmt);
+        else if (elseBlockOpen)
+            elseBlock.pushStmt(stmt);
+    }
+
+    @Override
+    public boolean done() {
+        return ifDone && elseDone;
     }
 
     @Override
@@ -358,13 +417,58 @@ class IfNode implements Node {
     }
 }
 
-class WhileNode implements Node {
+class WhileNode implements InstructionNode {
     private Node condition;
-    private Node block;
+    private BlockNode block;
+    private boolean blockOpen = false;
+    private boolean done = false;
 
-    public WhileNode(Node condition, Node block) {
+    public WhileNode() {
+        condition = null;
+        block = new BlockNode();
+    }
+
+    public WhileNode(Node condition) {
+        this.condition = condition;
+        block = new BlockNode();
+    }
+
+    public WhileNode(Node condition, BlockNode block) {
         this.condition = condition;
         this.block = block;
+    }
+
+    @Override
+    public void openBlock() {
+        if (done()) return;
+
+        blockOpen = true;
+    }
+
+    @Override
+    public void closeBlock() {
+        if (done()) return;
+
+        blockOpen = false;
+        done = true;
+    }
+
+    @Override
+    public void setCondition(Node condition) {
+        this.condition = condition;
+    }
+
+    @Override
+    public void addStmt(Node stmt) {
+        if (done()) return;
+
+        if (blockOpen)
+            block.pushStmt(stmt);
+    }
+
+    @Override
+    public boolean done() {
+        return done;
     }
 
     @Override
@@ -383,11 +487,6 @@ class WhileNode implements Node {
 class SequenceNode implements Node {
     private Node stmt1;
     private Node stmt2;
-
-    SequenceNode() {
-        stmt1 = null;
-        stmt2 = null;
-    }
 
     SequenceNode(Node stmt1, Node stmt2) {
         this.stmt1 = stmt1;

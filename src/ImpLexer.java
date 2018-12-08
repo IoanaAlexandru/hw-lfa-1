@@ -252,15 +252,15 @@ class ImpLexer {
 
   /* user code: */
     private TreeSet<VarNode> vars = new TreeSet<>();
-    private Block mainBlock = new Block();
+    private BlockNode mainBlock = new BlockNode();
 
     Node cond;
     private boolean varList = false, ifCond = false, whileCond = false, elseCond = true, getBlock1 = false, getBlock2 = false;
-    private Block block1 = new Block(), block2 = new Block();
+    private BlockNode block1 = new BlockNode(), block2 = new BlockNode();
     private LinkedList<Node> list = new LinkedList<>();
 
     public MainNode getMain() {
-        return new MainNode(mainBlock);
+        return new MainNode(mainBlock.getStmt());
     }
 
     private Node buildStmt(List<Node> list) {
@@ -779,12 +779,12 @@ class ImpLexer {
           case 29: break;
           case 11: 
             { if (getBlock1 && whileCond) {
-                mainBlock.pushStmt(new WhileNode(cond, block1.buildNode()));
+                mainBlock.pushStmt(new WhileNode(cond, block1));
                 whileCond = false;
                 block1.clear();
              }
              else if (getBlock2 && elseCond && !ifCond) {
-                 mainBlock.pushStmt(new IfNode(cond, block1.buildNode(), block2.buildNode()));
+                 mainBlock.pushStmt(new IfNode(cond, block1, block2));
                  ifCond = false;
                  elseCond = false;
                  block1.clear();
