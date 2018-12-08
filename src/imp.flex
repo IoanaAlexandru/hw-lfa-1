@@ -7,11 +7,9 @@ import java.util.*;
 %int
 %{
     private TreeSet<VarNode> vars = new TreeSet<>();
+    private boolean varList = false;
     private BlockNode mainBlock = new BlockNode();
-
-    Node cond;
-    private boolean varList = false, ifCond = false, whileCond = false, elseCond = true, getBlock1 = false, getBlock2 = false;
-    private BlockNode block1 = new BlockNode(), block2 = new BlockNode();
+    private LinkedList<InstructionNode> openInstructions = new LinkedList<>();
     private LinkedList<Node> list = new LinkedList<>();
 
     public MainNode getMain() {
@@ -133,54 +131,39 @@ Int = "int"
 {Plus}     { list.addLast(new Symbol("+")); }
 {Div}      { list.addLast(new Symbol("/")); }
 {Eq}       { list.addLast(new Symbol("=")); }
-{If}       { ifCond = true; }
-{Else}     {
-             ifCond = false;
-             elseCond = true;
-           }
-{While}    { whileCond = true; }
+{If}       { openInstructions.addFirst(new IfNode()); }
+{Else}     {}
+{While}    { openInstructions.addFirst(new WhileNode()); }
 {OpenPar}  { list.addLast(new Symbol("(")); }
 {ClosePar} { list.addLast(new Symbol(")")); }
 {And}      { list.addLast(new Symbol("&&")); }
 {Greater}  { list.addLast(new Symbol(">")); }
 {Not}      { list.addLast(new Symbol("!")); }
 {OpenBr}   {
-             if (ifCond || whileCond) {
-                 cond = buildStmt(list);
-                 getBlock1 = true;
-             }
-             if (elseCond)
-                 getBlock2 = true;
+             InstructionNode instruction = openInstructions.peekFirst();
+             if (!list.isEmpty())
+                 instruction.setCondition(buildStmt(list));
+             instruction.openBlock();
            }
 {CloseBr}  {
-             if (getBlock1 && whileCond) {
-                mainBlock.pushStmt(new WhileNode(cond, block1));
-                whileCond = false;
-                block1.clear();
+             InstructionNode instruction = openInstructions.peekFirst();
+             instruction.closeBlock();
+             if (instruction.done()) {
+                 openInstructions.removeFirst();
+                 if (openInstructions.isEmpty())
+                     mainBlock.pushStmt(instruction);
+                 else
+                     openInstructions.peekFirst().addStmt(instruction);
              }
-             else if (getBlock2 && elseCond && !ifCond) {
-                 mainBlock.pushStmt(new IfNode(cond, block1, block2));
-                 ifCond = false;
-                 elseCond = false;
-                 block1.clear();
-                 block2.clear();
-             }
-
-             if (getBlock1)
-                 getBlock1 = false;
-             if (getBlock2)
-                 getBlock2 = false;
            }
 {Semi}     {
              if (varList) {
                  varList = false;
              } else {
-                 if (getBlock1)
-                     block1.pushStmt(buildStmt(list));
-                 else if (getBlock2)
-                     block2.pushStmt(buildStmt(list));
+                 if (openInstructions.isEmpty())
+                     mainBlock.pushStmt(buildStmt(list));
                  else
-                    mainBlock.pushStmt(buildStmt(list));
+                     openInstructions.peekFirst().addStmt(buildStmt(list));
              }
            }
 {Var}      {

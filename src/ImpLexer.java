@@ -53,8 +53,8 @@ class ImpLexer {
   private static final String ZZ_ACTION_PACKED_0 =
     "\1\0\1\1\1\2\2\3\3\2\1\4\1\5\1\6"+
     "\1\7\1\1\1\10\1\11\1\12\1\13\1\14\1\15"+
-    "\5\2\1\16\1\17\5\2\1\20\1\2\1\21\1\22"+
-    "\1\2\1\23";
+    "\5\2\1\16\1\17\5\2\1\20\1\2\1\21\1\1"+
+    "\1\2\1\22";
 
   private static int [] zzUnpackAction() {
     int [] result = new int[37];
@@ -252,11 +252,9 @@ class ImpLexer {
 
   /* user code: */
     private TreeSet<VarNode> vars = new TreeSet<>();
+    private boolean varList = false;
     private BlockNode mainBlock = new BlockNode();
-
-    Node cond;
-    private boolean varList = false, ifCond = false, whileCond = false, elseCond = true, getBlock1 = false, getBlock2 = false;
-    private BlockNode block1 = new BlockNode(), block2 = new BlockNode();
+    private LinkedList<InstructionNode> openInstructions = new LinkedList<>();
     private LinkedList<Node> list = new LinkedList<>();
 
     public MainNode getMain() {
@@ -720,7 +718,7 @@ class ImpLexer {
             { 
             } 
             // fall through
-          case 20: break;
+          case 19: break;
           case 2: 
             { VarNode var = new VarNode(yytext());
             if (varList)
@@ -731,123 +729,105 @@ class ImpLexer {
                  System.out.println("UnassignedVar");
             } 
             // fall through
-          case 21: break;
+          case 20: break;
           case 3: 
             { list.addLast(new IntNode(yytext()));
             } 
             // fall through
-          case 22: break;
+          case 21: break;
           case 4: 
             { list.addLast(new Symbol("+"));
             } 
             // fall through
-          case 23: break;
+          case 22: break;
           case 5: 
             { list.addLast(new Symbol("/"));
             } 
             // fall through
-          case 24: break;
+          case 23: break;
           case 6: 
             { list.addLast(new Symbol("("));
             } 
             // fall through
-          case 25: break;
+          case 24: break;
           case 7: 
             { list.addLast(new Symbol(")"));
             } 
             // fall through
-          case 26: break;
+          case 25: break;
           case 8: 
             { list.addLast(new Symbol(">"));
             } 
             // fall through
-          case 27: break;
+          case 26: break;
           case 9: 
             { list.addLast(new Symbol("!"));
             } 
             // fall through
-          case 28: break;
+          case 27: break;
           case 10: 
-            { if (ifCond || whileCond) {
-                 cond = buildStmt(list);
-                 getBlock1 = true;
+            { InstructionNode instruction = openInstructions.peekFirst();
+             if (!list.isEmpty())
+                 instruction.setCondition(buildStmt(list));
+             instruction.openBlock();
+            } 
+            // fall through
+          case 28: break;
+          case 11: 
+            { InstructionNode instruction = openInstructions.peekFirst();
+             instruction.closeBlock();
+             if (instruction.done()) {
+                 openInstructions.removeFirst();
+                 if (openInstructions.isEmpty())
+                     mainBlock.pushStmt(instruction);
+                 else
+                     openInstructions.peekFirst().addStmt(instruction);
              }
-             if (elseCond)
-                 getBlock2 = true;
             } 
             // fall through
           case 29: break;
-          case 11: 
-            { if (getBlock1 && whileCond) {
-                mainBlock.pushStmt(new WhileNode(cond, block1));
-                whileCond = false;
-                block1.clear();
-             }
-             else if (getBlock2 && elseCond && !ifCond) {
-                 mainBlock.pushStmt(new IfNode(cond, block1, block2));
-                 ifCond = false;
-                 elseCond = false;
-                 block1.clear();
-                 block2.clear();
-             }
-
-             if (getBlock1)
-                 getBlock1 = false;
-             if (getBlock2)
-                 getBlock2 = false;
-            } 
-            // fall through
-          case 30: break;
           case 12: 
             { list.addLast(new Symbol("="));
             } 
             // fall through
-          case 31: break;
+          case 30: break;
           case 13: 
             { if (varList) {
                  varList = false;
              } else {
-                 if (getBlock1)
-                     block1.pushStmt(buildStmt(list));
-                 else if (getBlock2)
-                     block2.pushStmt(buildStmt(list));
+                 if (openInstructions.isEmpty())
+                     mainBlock.pushStmt(buildStmt(list));
                  else
-                    mainBlock.pushStmt(buildStmt(list));
+                     openInstructions.peekFirst().addStmt(buildStmt(list));
              }
             } 
             // fall through
-          case 32: break;
+          case 31: break;
           case 14: 
             { list.addLast(new Symbol("&&"));
             } 
             // fall through
-          case 33: break;
+          case 32: break;
           case 15: 
-            { ifCond = true;
+            { openInstructions.addFirst(new IfNode());
             } 
             // fall through
-          case 34: break;
+          case 33: break;
           case 16: 
             { varList = true;
             } 
             // fall through
-          case 35: break;
+          case 34: break;
           case 17: 
             { list.addLast(new BoolNode(yytext()));
             } 
             // fall through
-          case 36: break;
+          case 35: break;
           case 18: 
-            { ifCond = false;
-             elseCond = true;
+            { openInstructions.addFirst(new WhileNode());
             } 
             // fall through
-          case 37: break;
-          case 19: 
-            { whileCond = true;
-            } 
-            // fall through
-          case 38: break;
+          case 36: break;
           default:
             zzScanError(ZZ_NO_MATCH);
         }

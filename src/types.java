@@ -302,6 +302,10 @@ class BlockNode implements Node {
         return stmts.removeFirst();
     }
 
+    Node peekStmt() {
+        return stmts.peekFirst();
+    }
+
     void clear() {
         stmts.clear();
     }
