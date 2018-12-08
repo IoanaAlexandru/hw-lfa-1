@@ -41,27 +41,48 @@ class Symbol implements Node {
     }
 }
 
-class MainNode implements Node {
-    private Deque<Node> prog = new LinkedList<>();
+class Block {
+    Deque<Node> stmts = new LinkedList<>();
 
     void pushStmt(Node stmt) {
-        prog.addFirst(stmt);
+        stmts.addFirst(stmt);
     }
 
     Node popStmt() {
-        return prog.removeFirst();
+        return stmts.removeFirst();
     }
 
-    private Node buildSequence() {
-        Node node = prog.removeLast();
-        if (prog.isEmpty())
+    void clear() {
+        stmts.clear();
+    }
+
+    BlockNode buildNode() {
+        if (stmts.isEmpty())
+            return new BlockNode();
+        if (stmts.size() == 1)
+            return new BlockNode(stmts.getFirst());
+        return new BlockNode(buildSequence());
+    }
+
+    Node buildSequence() {
+        Node node = stmts.removeLast();
+        if (stmts.isEmpty())
             return node;
         return new SequenceNode(node, buildSequence());
     }
 
+}
+
+class MainNode implements Node {
+    private Block block;
+
+    public MainNode(Block block) {
+        this.block = block;
+    }
+
     @Override
     public String show() {
-        return "<MainNode>\n" + Parser.addNewline(buildSequence().show());
+        return "<MainNode>\n" + Parser.addNewline(block.buildSequence().show());
     }
 
     @Override
@@ -318,6 +339,12 @@ class IfNode implements Node {
     private Node ifBlock;
     private Node elseBlock;
 
+    public IfNode(Node condition, Node ifBlock, Node elseBlock) {
+        this.condition = condition;
+        this.ifBlock = ifBlock;
+        this.elseBlock = elseBlock;
+    }
+
     @Override
     public String show() {
         String print = condition.show() + ifBlock.show() + elseBlock.show();
@@ -332,12 +359,17 @@ class IfNode implements Node {
 }
 
 class WhileNode implements Node {
-    private Node contition;
+    private Node condition;
     private Node block;
+
+    public WhileNode(Node condition, Node block) {
+        this.condition = condition;
+        this.block = block;
+    }
 
     @Override
     public String show() {
-        String print = contition.show() + block.show();
+        String print = condition.show() + block.show();
 
         return "<WhileNode> while\n" + Parser.addNewline(print);
     }
@@ -352,6 +384,11 @@ class SequenceNode implements Node {
     private Node stmt1;
     private Node stmt2;
 
+    SequenceNode() {
+        stmt1 = null;
+        stmt2 = null;
+    }
+
     SequenceNode(Node stmt1, Node stmt2) {
         this.stmt1 = stmt1;
         this.stmt2 = stmt2;
@@ -359,8 +396,10 @@ class SequenceNode implements Node {
 
     @Override
     public String show() {
-        String print = stmt1.show() + stmt2.show();
+        if (stmt1 == null || stmt2 == null)
+            return "<SequenceNode>\n";
 
+        String print = stmt1.show() + stmt2.show();
         return "<SequenceNode>\n" + Parser.addNewline(print);
     }
 

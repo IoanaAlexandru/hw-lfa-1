@@ -21,7 +21,7 @@ public class Parser {
         l.yylex();
 
         PrintWriter writer = new PrintWriter("arbore", "UTF-8");
-        writer.print(l.main.show());
+        writer.print(l.getMain().show());
         writer.close();
     }
 }

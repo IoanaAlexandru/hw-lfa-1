@@ -1,5 +1,4 @@
 import java.util.*;
-import java.io.IOException;
 
 %%
  
@@ -8,9 +7,16 @@ import java.io.IOException;
 %int
 %{
     private TreeSet<VarNode> vars = new TreeSet<>();
-    private boolean varList = false;
-    MainNode main = new MainNode();
+    private Block mainBlock = new Block();
+
+    Node cond;
+    private boolean varList = false, ifCond = false, whileCond = false, elseCond = true, getBlock1 = false, getBlock2 = false;
+    private Block block1 = new Block(), block2 = new Block();
     private LinkedList<Node> list = new LinkedList<>();
+
+    public MainNode getMain() {
+        return new MainNode(mainBlock);
+    }
 
     private Node buildStmt(List<Node> list) {
         // Mind operator precedence
@@ -126,22 +132,57 @@ Int = "int"
 {BVal}     { list.addLast(new BoolNode(yytext())); }
 {Plus}     { list.addLast(new Symbol("+")); }
 {Div}      { list.addLast(new Symbol("/")); }
+{Eq}       { list.addLast(new Symbol("=")); }
+{If}       { ifCond = true; }
+{Else}     {
+             ifCond = false;
+             elseCond = true;
+           }
+{While}    { whileCond = true; }
 {OpenPar}  { list.addLast(new Symbol("(")); }
-{ClosePar} { list.addLast(new Symbol(")")); }
+{ClosePar} {
+             list.addLast(new Symbol(")"));
+             if (ifCond || whileCond)
+                 cond = buildStmt(list);
+           }
 {And}      { list.addLast(new Symbol("&&")); }
 {Greater}  { list.addLast(new Symbol(">")); }
 {Not}      { list.addLast(new Symbol("!")); }
-{OpenBr}   { list.addLast(new Symbol("{")); }
-{CloseBr}  { list.addLast(new Symbol("}")); }
-{Eq}       { list.addLast(new Symbol("=")); }
-{If}       { list.addLast(new Symbol("if")); }
-{Else}     { list.addLast(new Symbol("else")); }
-{While}    { list.addLast(new Symbol("while")); }
+{OpenBr}   {
+             if (ifCond || whileCond)
+                 getBlock1 = true;
+             if (elseCond)
+                 getBlock2 = true;
+           }
+{CloseBr}  {
+             if (getBlock1 && whileCond) {
+                mainBlock.pushStmt(new WhileNode(cond, block1.buildNode()));
+                whileCond = false;
+                block1.clear();
+             }
+             else if (getBlock2 && elseCond && !ifCond) {
+                 mainBlock.pushStmt(new IfNode(cond, block1.buildNode(), block2.buildNode()));
+                 ifCond = false;
+                 elseCond = false;
+                 block1.clear();
+                 block2.clear();
+             }
+
+             if (getBlock1)
+                 getBlock1 = false;
+             if (getBlock2)
+                 getBlock2 = false;
+           }
 {Semi}     {
              if (varList) {
                  varList = false;
              } else {
-                 main.pushStmt(buildStmt(list));
+                 if (getBlock1)
+                     block1.pushStmt(buildStmt(list));
+                 else if (getBlock2)
+                     block2.pushStmt(buildStmt(list));
+                 else
+                    mainBlock.pushStmt(buildStmt(list));
              }
            }
 {Var}      {
