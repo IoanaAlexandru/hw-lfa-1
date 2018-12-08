@@ -269,7 +269,7 @@ class ImpLexer {
         // Brackets
         Symbol openSym = new Symbol("(");
         Symbol closeSym = new Symbol(")");
-        int open = list.indexOf(openSym);
+        int open = list.lastIndexOf(openSym);
         while (open != -1) {
             int close = list.indexOf(closeSym);
             Node bracketNode = new BracketNode(buildStmt(list.subList(open + 1, close)));
@@ -754,8 +754,6 @@ class ImpLexer {
           case 25: break;
           case 7: 
             { list.addLast(new Symbol(")"));
-             if (ifCond || whileCond)
-                 cond = buildStmt(list);
             } 
             // fall through
           case 26: break;
@@ -770,8 +768,10 @@ class ImpLexer {
             // fall through
           case 28: break;
           case 10: 
-            { if (ifCond || whileCond)
+            { if (ifCond || whileCond) {
+                 cond = buildStmt(list);
                  getBlock1 = true;
+             }
              if (elseCond)
                  getBlock2 = true;
             } 

@@ -24,7 +24,7 @@ import java.util.*;
         // Brackets
         Symbol openSym = new Symbol("(");
         Symbol closeSym = new Symbol(")");
-        int open = list.indexOf(openSym);
+        int open = list.lastIndexOf(openSym);
         while (open != -1) {
             int close = list.indexOf(closeSym);
             Node bracketNode = new BracketNode(buildStmt(list.subList(open + 1, close)));
@@ -140,17 +140,15 @@ Int = "int"
            }
 {While}    { whileCond = true; }
 {OpenPar}  { list.addLast(new Symbol("(")); }
-{ClosePar} {
-             list.addLast(new Symbol(")"));
-             if (ifCond || whileCond)
-                 cond = buildStmt(list);
-           }
+{ClosePar} { list.addLast(new Symbol(")")); }
 {And}      { list.addLast(new Symbol("&&")); }
 {Greater}  { list.addLast(new Symbol(">")); }
 {Not}      { list.addLast(new Symbol("!")); }
 {OpenBr}   {
-             if (ifCond || whileCond)
+             if (ifCond || whileCond) {
+                 cond = buildStmt(list);
                  getBlock1 = true;
+             }
              if (elseCond)
                  getBlock2 = true;
            }
