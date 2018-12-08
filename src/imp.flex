@@ -22,9 +22,10 @@ import java.util.*;
         // Brackets
         Symbol openSym = new Symbol("(");
         Symbol closeSym = new Symbol(")");
-        int open = list.lastIndexOf(openSym);
-        while (open != -1) {
-            int close = list.indexOf(closeSym);
+        int close = list.indexOf(closeSym), open = -1;
+        if (close != -1)
+            open = list.subList(0, close).lastIndexOf(openSym);
+        while (open != -1 && close != -1) {
             Node bracketNode = new BracketNode(buildStmt(list.subList(open + 1, close)));
 
             // Remove leftover brackets
@@ -32,7 +33,9 @@ import java.util.*;
             list.remove(open);
 
             list.add(open, bracketNode);
-            open = list.indexOf(openSym);
+            close = list.indexOf(closeSym);
+            if (close != -1)
+                open = list.subList(0, close).lastIndexOf(openSym);
         }
 
         // Not
