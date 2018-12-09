@@ -3,6 +3,8 @@ import java.util.TreeMap;
 
 interface Node {
     String show();
+
+    int getLine();
 }
 
 interface StmtNode extends Node {
@@ -52,13 +54,20 @@ class Symbol implements Node {
     public String show() {
         return null;
     }
+
+    @Override
+    public int getLine() {
+        return -1;
+    }
 }
 
 class MainNode implements StmtNode {
+    private int line;
     private StmtNode prog;
 
-    public MainNode(Node prog) {
+    public MainNode(int line, Node prog) {
         // TODO check everywhere if parameters are instances of the right class before casting
+        this.line = line;
         this.prog = (StmtNode) prog;
     }
 
@@ -71,12 +80,19 @@ class MainNode implements StmtNode {
     public void interpret(TreeMap<VarNode, Integer> vars) {
         prog.interpret(vars);
     }
+
+    @Override
+    public int getLine() {
+        return line;
+    }
 }
 
 class IntNode implements ANode {
+    private int line;
     private int number;
 
-    public IntNode(String number) {
+    public IntNode(int line, String number) {
+        this.line = line;
         this.number = Integer.parseInt(number);
     }
 
@@ -91,15 +107,22 @@ class IntNode implements ANode {
     }
 
     @Override
+    public int getLine() {
+        return line;
+    }
+
+    @Override
     public Integer interpretA(TreeMap<VarNode, Integer> vars) {
         return number;
     }
 }
 
 class BoolNode implements BNode {
+    private int line;
     private boolean bool;
 
-    public BoolNode(String bool) {
+    public BoolNode(int line, String bool) {
+        this.line = line;
         this.bool = bool.equalsIgnoreCase("true");
     }
 
@@ -114,15 +137,22 @@ class BoolNode implements BNode {
     }
 
     @Override
+    public int getLine() {
+        return line;
+    }
+
+    @Override
     public Boolean interpretB(TreeMap<VarNode, Integer> vars) {
         return bool;
     }
 }
 
 class VarNode implements ANode, Comparable {
+    private int line;
     private String var;
 
-    public VarNode(String var) {
+    public VarNode(int line, String var) {
+        this.line = line;
         this.var = var;
     }
 
@@ -134,6 +164,11 @@ class VarNode implements ANode, Comparable {
     @Override
     public String show() {
         return "<VariableNode> " + var + "\n";
+    }
+
+    @Override
+    public int getLine() {
+        return line;
     }
 
     @Override
@@ -155,10 +190,12 @@ class VarNode implements ANode, Comparable {
 }
 
 class PlusNode implements ANode {
+    private int line;
     private ANode aExpr1;
     private ANode aExpr2;
 
-    public PlusNode(Node aExpr1, Node aExpr2) {
+    public PlusNode(int line, Node aExpr1, Node aExpr2) {
+        this.line = line;
         this.aExpr1 = (ANode) aExpr1;
         this.aExpr2 = (ANode) aExpr2;
     }
@@ -171,16 +208,23 @@ class PlusNode implements ANode {
     }
 
     @Override
+    public int getLine() {
+        return line;
+    }
+
+    @Override
     public Integer interpretA(TreeMap<VarNode, Integer> vars) {
         return aExpr1.interpretA(vars) + aExpr2.interpretA(vars);
     }
 }
 
 class DivNode implements ANode {
+    private int line;
     private ANode aExpr1;
     private ANode aExpr2;
 
-    public DivNode(Node aExpr1, Node aExpr2) {
+    public DivNode(int line, Node aExpr1, Node aExpr2) {
+        this.line = line;
         this.aExpr1 = (ANode) aExpr1;
         this.aExpr2 = (ANode) aExpr2;
     }
@@ -193,21 +237,33 @@ class DivNode implements ANode {
     }
 
     @Override
+    public int getLine() {
+        return line;
+    }
+
+    @Override
     public Integer interpretA(TreeMap<VarNode, Integer> vars) {
         return aExpr1.interpretA(vars) / aExpr2.interpretA(vars);
     }
 }
 
 class BracketNode implements ANode, BNode {
+    private int line;
     private Node expr;
 
-    public BracketNode(Node expr) {
+    public BracketNode(int line, Node expr) {
+        this.line = line;
         this.expr = expr;
     }
 
     @Override
     public String show() {
         return "<BracketNode> ()\n" + Parser.addNewline(expr.show());
+    }
+
+    @Override
+    public int getLine() {
+        return line;
     }
 
     @Override
@@ -226,10 +282,12 @@ class BracketNode implements ANode, BNode {
 }
 
 class AndNode implements BNode {
+    private int line;
     private BNode bExpr1;
     private BNode bExpr2;
 
-    public AndNode(Node bExpr1, Node bExpr2) {
+    public AndNode(int line, Node bExpr1, Node bExpr2) {
+        this.line = line;
         this.bExpr1 = (BNode) bExpr1;
         this.bExpr2 = (BNode) bExpr2;
     }
@@ -242,16 +300,23 @@ class AndNode implements BNode {
     }
 
     @Override
+    public int getLine() {
+        return line;
+    }
+
+    @Override
     public Boolean interpretB(TreeMap<VarNode, Integer> vars) {
         return bExpr1.interpretB(vars) && bExpr2.interpretB(vars);
     }
 }
 
 class GreaterNode implements BNode {
+    private int line;
     private ANode aExpr1;
     private ANode aExpr2;
 
-    public GreaterNode(Node aExpr1, Node aExpr2) {
+    public GreaterNode(int line, Node aExpr1, Node aExpr2) {
+        this.line = line;
         this.aExpr1 = (ANode) aExpr1;
         this.aExpr2 = (ANode) aExpr2;
     }
@@ -264,15 +329,22 @@ class GreaterNode implements BNode {
     }
 
     @Override
+    public int getLine() {
+        return line;
+    }
+
+    @Override
     public Boolean interpretB(TreeMap<VarNode, Integer> vars) {
         return aExpr1.interpretA(vars) > aExpr2.interpretA(vars);
     }
 }
 
 class NotNode implements BNode {
+    private int line;
     private BNode bExpr;
 
-    public NotNode(Node bExpr) {
+    public NotNode(int line, Node bExpr) {
+        this.line = line;
         this.bExpr = (BNode) bExpr;
     }
 
@@ -282,16 +354,23 @@ class NotNode implements BNode {
     }
 
     @Override
+    public int getLine() {
+        return line;
+    }
+
+    @Override
     public Boolean interpretB(TreeMap<VarNode, Integer> vars) {
         return !bExpr.interpretB(vars);
     }
 }
 
 class AssignmentNode implements StmtNode {
+    private int line;
     private VarNode var;
     private ANode aExpr;
 
-    public AssignmentNode(Node left, Node right) {
+    public AssignmentNode(int line, Node left, Node right) {
+        this.line = line;
         this.var = (VarNode) left;
         this.aExpr = (ANode) right;
     }
@@ -304,15 +383,23 @@ class AssignmentNode implements StmtNode {
     }
 
     @Override
+    public int getLine() {
+        return line;
+    }
+
+    @Override
     public void interpret(TreeMap<VarNode, Integer> vars) {
         vars.put(var, aExpr.interpretA(vars));
     }
 }
 
 class BlockNode implements StmtNode {
+    private int line;
     private LinkedList<StmtNode> stmts = new LinkedList<>();
 
     void pushStmt(Node stmt) {
+        if (stmts.isEmpty())
+            line = stmt.getLine();
         stmts.addFirst((StmtNode) stmt);
     }
 
@@ -335,7 +422,7 @@ class BlockNode implements StmtNode {
         StmtNode node = stmts.removeLast();
         if (stmts.isEmpty())
             return node;
-        return new SequenceNode(node, buildSequence());
+        return new SequenceNode(node.getLine(), node, buildSequence());
     }
 
     @Override
@@ -346,6 +433,11 @@ class BlockNode implements StmtNode {
     }
 
     @Override
+    public int getLine() {
+        return line;
+    }
+
+    @Override
     public void interpret(TreeMap<VarNode, Integer> vars) {
         if (!stmts.isEmpty())
             getStmt().interpret(vars);
@@ -353,6 +445,7 @@ class BlockNode implements StmtNode {
 }
 
 class IfNode implements InstructionNode {
+    private int line;
     private BNode condition;
     private BlockNode ifBlock;
     private BlockNode elseBlock;
@@ -361,19 +454,22 @@ class IfNode implements InstructionNode {
     private boolean ifDone = false;
     private boolean elseDone = false;
 
-    public IfNode() {
+    public IfNode(int line) {
+        this.line = line;
         condition = null;
         ifBlock = new BlockNode();
         elseBlock = new BlockNode();
     }
 
-    public IfNode(Node condition) {
+    public IfNode(int line, Node condition) {
+        this.line = line;
         this.condition = (BNode) condition;
         ifBlock = new BlockNode();
         elseBlock = new BlockNode();
     }
 
-    public IfNode(Node condition, Node ifBlock, Node elseBlock) {
+    public IfNode(int line, Node condition, Node ifBlock, Node elseBlock) {
+        this.line = line;
         this.condition = (BNode) condition;
         this.ifBlock = (BlockNode) ifBlock;
         this.elseBlock = (BlockNode) elseBlock;
@@ -430,6 +526,11 @@ class IfNode implements InstructionNode {
     }
 
     @Override
+    public int getLine() {
+        return line;
+    }
+
+    @Override
     public void interpret(TreeMap<VarNode, Integer> vars) {
         if (condition.interpretB(vars))
             ifBlock.interpret(vars);
@@ -439,22 +540,26 @@ class IfNode implements InstructionNode {
 }
 
 class WhileNode implements InstructionNode {
+    private int line;
     private BNode condition;
     private BlockNode block;
     private boolean blockOpen = false;
     private boolean done = false;
 
-    public WhileNode() {
+    public WhileNode(int line) {
+        this.line = line;
         condition = null;
         block = new BlockNode();
     }
 
-    public WhileNode(Node condition) {
+    public WhileNode(int line, Node condition) {
+        this.line = line;
         this.condition = (BNode) condition;
         block = new BlockNode();
     }
 
-    public WhileNode(Node condition, Node block) {
+    public WhileNode(int line, Node condition, Node block) {
+        this.line = line;
         this.condition = (BNode) condition;
         this.block = (BlockNode) block;
     }
@@ -500,6 +605,11 @@ class WhileNode implements InstructionNode {
     }
 
     @Override
+    public int getLine() {
+        return line;
+    }
+
+    @Override
     public void interpret(TreeMap<VarNode, Integer> vars) {
         while (condition.interpretB(vars))
             block.interpret(vars);
@@ -507,10 +617,12 @@ class WhileNode implements InstructionNode {
 }
 
 class SequenceNode implements StmtNode {
+    private int line;
     private StmtNode stmt1;
     private StmtNode stmt2;
 
-    SequenceNode(Node stmt1, Node stmt2) {
+    SequenceNode(int line, Node stmt1, Node stmt2) {
+        this.line = line;
         this.stmt1 = (StmtNode) stmt1;
         this.stmt2 = (StmtNode) stmt2;
     }
@@ -522,6 +634,11 @@ class SequenceNode implements StmtNode {
 
         String print = stmt1.show() + stmt2.show();
         return "<SequenceNode>\n" + Parser.addNewline(print);
+    }
+
+    @Override
+    public int getLine() {
+        return line;
     }
 
     @Override

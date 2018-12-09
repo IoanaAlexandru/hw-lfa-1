@@ -33,12 +33,12 @@ class ImpLexer {
    * Translates characters to character classes
    */
   private static final String ZZ_CMAP_PACKED = 
-    "\12\0\1\0\1\33\1\33\1\33\23\0\1\22\4\0\1\20\1\0"+
+    "\12\0\1\33\1\34\1\34\1\34\23\0\1\22\4\0\1\20\1\0"+
     "\1\16\1\17\1\0\1\14\3\0\1\15\1\3\11\2\1\0\1\26"+
     "\1\0\1\25\1\21\42\0\1\11\3\1\1\7\1\10\1\1\1\31"+
     "\1\27\2\1\1\12\1\1\1\32\3\1\1\5\1\13\1\4\1\6"+
-    "\1\1\1\30\3\1\1\23\1\0\1\24\7\0\1\33\u1fa2\0\1\33"+
-    "\1\33\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\udfe6\0";
+    "\1\1\1\30\3\1\1\23\1\0\1\24\7\0\1\34\u1fa2\0\1\34"+
+    "\1\34\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\udfe6\0";
 
   /** 
    * Translates characters to character classes
@@ -53,11 +53,11 @@ class ImpLexer {
   private static final String ZZ_ACTION_PACKED_0 =
     "\1\0\1\1\1\2\2\3\3\2\1\4\1\5\1\6"+
     "\1\7\1\1\1\10\1\11\1\12\1\13\1\14\1\15"+
-    "\5\2\1\16\1\17\5\2\1\20\1\2\1\21\1\1"+
-    "\1\2\1\22";
+    "\2\2\1\16\3\2\1\17\1\20\5\2\1\21\1\2"+
+    "\1\22\1\1\1\2\1\23";
 
   private static int [] zzUnpackAction() {
-    int [] result = new int[37];
+    int [] result = new int[38];
     int offset = 0;
     offset = zzUnpackAction(ZZ_ACTION_PACKED_0, offset, result);
     return result;
@@ -82,14 +82,14 @@ class ImpLexer {
   private static final int [] ZZ_ROWMAP = zzUnpackRowMap();
 
   private static final String ZZ_ROWMAP_PACKED_0 =
-    "\0\0\0\34\0\70\0\124\0\34\0\160\0\214\0\250"+
-    "\0\34\0\34\0\34\0\34\0\304\0\34\0\34\0\34"+
-    "\0\34\0\34\0\34\0\340\0\374\0\u0118\0\u0134\0\u0150"+
-    "\0\34\0\70\0\u016c\0\u0188\0\u01a4\0\u01c0\0\u01dc\0\70"+
-    "\0\u01f8\0\70\0\70\0\u0214\0\70";
+    "\0\0\0\35\0\72\0\127\0\35\0\164\0\221\0\256"+
+    "\0\35\0\35\0\35\0\35\0\313\0\35\0\35\0\35"+
+    "\0\35\0\35\0\35\0\350\0\u0105\0\35\0\u0122\0\u013f"+
+    "\0\u015c\0\35\0\72\0\u0179\0\u0196\0\u01b3\0\u01d0\0\u01ed"+
+    "\0\72\0\u020a\0\72\0\72\0\u0227\0\72";
 
   private static int [] zzUnpackRowMap() {
-    int [] result = new int[37];
+    int [] result = new int[38];
     int offset = 0;
     offset = zzUnpackRowMap(ZZ_ROWMAP_PACKED_0, offset, result);
     return result;
@@ -114,26 +114,26 @@ class ImpLexer {
   private static final String ZZ_TRANS_PACKED_0 =
     "\1\2\1\3\1\4\1\5\1\6\2\3\1\7\1\10"+
     "\3\3\1\11\1\12\1\13\1\14\1\15\1\16\1\17"+
-    "\1\20\1\21\1\22\1\23\1\24\1\25\2\3\36\0"+
-    "\1\3\2\0\10\3\13\0\4\3\3\0\2\4\31\0"+
-    "\1\3\2\0\1\3\1\26\6\3\13\0\4\3\2\0"+
-    "\1\3\2\0\6\3\1\27\1\3\13\0\4\3\2\0"+
-    "\1\3\2\0\5\3\1\30\2\3\13\0\4\3\21\0"+
-    "\1\31\14\0\1\3\2\0\4\3\1\32\3\3\13\0"+
-    "\3\3\1\33\2\0\1\3\2\0\10\3\13\0\2\3"+
-    "\1\34\1\3\2\0\1\3\2\0\2\3\1\35\5\3"+
-    "\13\0\4\3\2\0\1\3\2\0\7\3\1\36\13\0"+
-    "\4\3\2\0\1\3\2\0\6\3\1\37\1\3\13\0"+
-    "\4\3\2\0\1\3\2\0\1\40\7\3\13\0\4\3"+
-    "\2\0\1\3\2\0\10\3\13\0\1\41\3\3\2\0"+
-    "\1\3\2\0\3\3\1\42\4\3\13\0\4\3\2\0"+
-    "\1\3\2\0\3\3\1\43\4\3\13\0\4\3\2\0"+
-    "\1\3\2\0\7\3\1\35\13\0\4\3\2\0\1\3"+
-    "\2\0\6\3\1\44\1\3\13\0\4\3\2\0\1\3"+
-    "\2\0\3\3\1\45\4\3\13\0\4\3\1\0";
+    "\1\20\1\21\1\22\1\23\1\24\1\25\2\3\1\26"+
+    "\37\0\1\3\2\0\10\3\13\0\4\3\4\0\2\4"+
+    "\32\0\1\3\2\0\1\3\1\27\6\3\13\0\4\3"+
+    "\3\0\1\3\2\0\6\3\1\30\1\3\13\0\4\3"+
+    "\3\0\1\3\2\0\5\3\1\31\2\3\13\0\4\3"+
+    "\22\0\1\32\15\0\1\3\2\0\4\3\1\33\3\3"+
+    "\13\0\3\3\1\34\3\0\1\3\2\0\10\3\13\0"+
+    "\2\3\1\35\1\3\3\0\1\3\2\0\2\3\1\36"+
+    "\5\3\13\0\4\3\3\0\1\3\2\0\7\3\1\37"+
+    "\13\0\4\3\3\0\1\3\2\0\6\3\1\40\1\3"+
+    "\13\0\4\3\3\0\1\3\2\0\1\41\7\3\13\0"+
+    "\4\3\3\0\1\3\2\0\10\3\13\0\1\42\3\3"+
+    "\3\0\1\3\2\0\3\3\1\43\4\3\13\0\4\3"+
+    "\3\0\1\3\2\0\3\3\1\44\4\3\13\0\4\3"+
+    "\3\0\1\3\2\0\7\3\1\36\13\0\4\3\3\0"+
+    "\1\3\2\0\6\3\1\45\1\3\13\0\4\3\3\0"+
+    "\1\3\2\0\3\3\1\46\4\3\13\0\4\3\2\0";
 
   private static int [] zzUnpackTrans() {
-    int [] result = new int[560];
+    int [] result = new int[580];
     int offset = 0;
     offset = zzUnpackTrans(ZZ_TRANS_PACKED_0, offset, result);
     return result;
@@ -172,10 +172,10 @@ class ImpLexer {
 
   private static final String ZZ_ATTRIBUTE_PACKED_0 =
     "\1\0\1\11\2\1\1\11\3\1\4\11\1\1\6\11"+
-    "\5\1\1\11\14\1";
+    "\2\1\1\11\3\1\1\11\14\1";
 
   private static int [] zzUnpackAttribute() {
-    int [] result = new int[37];
+    int [] result = new int[38];
     int offset = 0;
     offset = zzUnpackAttribute(ZZ_ATTRIBUTE_PACKED_0, offset, result);
     return result;
@@ -257,9 +257,10 @@ class ImpLexer {
     private BlockNode mainBlock = new BlockNode();
     private LinkedList<InstructionNode> openInstructions = new LinkedList<>();
     private LinkedList<Node> list = new LinkedList<>();
+    int line = -1;
 
     public MainNode getMain() {
-        return new MainNode(mainBlock.getStmt());
+        return new MainNode(line, mainBlock.getStmt());
     }
 
     // Get list of vars as originally initialised
@@ -282,7 +283,7 @@ class ImpLexer {
         if (close != -1)
             open = list.subList(0, close).lastIndexOf(openSym);
         while (open != -1 && close != -1) {
-            Node bracketNode = new BracketNode(buildStmt(list.subList(open + 1, close)));
+            Node bracketNode = new BracketNode(line, buildStmt(list.subList(open + 1, close)));
 
             // Remove leftover brackets
             list.remove(open);
@@ -298,7 +299,7 @@ class ImpLexer {
         Symbol notSym = new Symbol("!");
         int not = list.indexOf(notSym);
         while (not != -1) {
-            Node notNode = new NotNode(list.get(not + 1));
+            Node notNode = new NotNode(line, list.get(not + 1));
             list.subList(not, not + 2).clear();
             list.add(not, notNode);
             not = list.indexOf(notSym);
@@ -308,7 +309,7 @@ class ImpLexer {
         Symbol divSym = new Symbol("/");
         int div = list.indexOf(divSym);
         while (div != -1) {
-            Node divNode = new DivNode(list.get(div - 1), list.get(div + 1));
+            Node divNode = new DivNode(line, list.get(div - 1), list.get(div + 1));
             list.subList(div - 1, div + 2).clear();
             list.add(div - 1, divNode);
             div = list.indexOf(divSym);
@@ -318,7 +319,7 @@ class ImpLexer {
         Symbol plusSym = new Symbol("+");
         int plus = list.indexOf(plusSym);
         while (plus != -1) {
-            Node plusNode = new PlusNode(list.get(plus - 1), list.get(plus + 1));
+            Node plusNode = new PlusNode(line, list.get(plus - 1), list.get(plus + 1));
             list.subList(plus - 1, plus + 2).clear();
             list.add(plus - 1, plusNode);
             plus = list.indexOf(plusSym);
@@ -329,7 +330,7 @@ class ImpLexer {
         Symbol greaterSym = new Symbol(">");
         int greater = list.indexOf(greaterSym);
         while (greater != -1) {
-            Node greaterNode = new GreaterNode(list.get(greater - 1), list.get(greater + 1));
+            Node greaterNode = new GreaterNode(line, list.get(greater - 1), list.get(greater + 1));
             list.subList(greater - 1, greater + 2).clear();
             list.add(greater - 1, greaterNode);
             greater = list.indexOf(greaterSym);
@@ -339,7 +340,7 @@ class ImpLexer {
         Symbol andSym = new Symbol("&&");
         int and = list.indexOf(andSym);
         while (and != -1) {
-            Node andNode = new AndNode(list.get(and - 1), list.get(and + 1));
+            Node andNode = new AndNode(line, list.get(and - 1), list.get(and + 1));
             list.subList(and - 1, and + 2).clear();
             list.add(and - 1, andNode);
             and = list.indexOf(andSym);
@@ -349,7 +350,7 @@ class ImpLexer {
         Symbol assignSym = new Symbol("=");
         int assign = list.indexOf(assignSym);
         while (assign != -1) {
-            Node assignNode = new AssignmentNode(list.get(assign - 1), list.get(assign + 1));
+            Node assignNode = new AssignmentNode(line, list.get(assign - 1), list.get(assign + 1));
             list.subList(assign - 1, assign + 2).clear();
             list.add(assign - 1, assignNode);
             assign = list.indexOf(assignSym);
@@ -732,9 +733,9 @@ class ImpLexer {
             { 
             } 
             // fall through
-          case 19: break;
+          case 20: break;
           case 2: 
-            { VarNode var = new VarNode(yytext());
+            { VarNode var = new VarNode(line, yytext());
              if (varList) {
                  vars.put(var, null);
                  orderedVars.addLast(var);
@@ -745,42 +746,42 @@ class ImpLexer {
                  System.out.println("UnassignedVar");
             } 
             // fall through
-          case 20: break;
+          case 21: break;
           case 3: 
-            { list.addLast(new IntNode(yytext()));
+            { list.addLast(new IntNode(line, yytext()));
             } 
             // fall through
-          case 21: break;
+          case 22: break;
           case 4: 
             { list.addLast(new Symbol("+"));
             } 
             // fall through
-          case 22: break;
+          case 23: break;
           case 5: 
             { list.addLast(new Symbol("/"));
             } 
             // fall through
-          case 23: break;
+          case 24: break;
           case 6: 
             { list.addLast(new Symbol("("));
             } 
             // fall through
-          case 24: break;
+          case 25: break;
           case 7: 
             { list.addLast(new Symbol(")"));
             } 
             // fall through
-          case 25: break;
+          case 26: break;
           case 8: 
             { list.addLast(new Symbol(">"));
             } 
             // fall through
-          case 26: break;
+          case 27: break;
           case 9: 
             { list.addLast(new Symbol("!"));
             } 
             // fall through
-          case 27: break;
+          case 28: break;
           case 10: 
             { InstructionNode instruction = openInstructions.peekFirst();
              if (!list.isEmpty())
@@ -788,7 +789,7 @@ class ImpLexer {
              instruction.openBlock();
             } 
             // fall through
-          case 28: break;
+          case 29: break;
           case 11: 
             { InstructionNode instruction = openInstructions.peekFirst();
              instruction.closeBlock();
@@ -801,12 +802,12 @@ class ImpLexer {
              }
             } 
             // fall through
-          case 29: break;
+          case 30: break;
           case 12: 
             { list.addLast(new Symbol("="));
             } 
             // fall through
-          case 30: break;
+          case 31: break;
           case 13: 
             { if (varList) {
                  varList = false;
@@ -818,32 +819,37 @@ class ImpLexer {
              }
             } 
             // fall through
-          case 31: break;
-          case 14: 
-            { list.addLast(new Symbol("&&"));
-            } 
-            // fall through
           case 32: break;
-          case 15: 
-            { openInstructions.addFirst(new IfNode());
+          case 14: 
+            { line++;
             } 
             // fall through
           case 33: break;
-          case 16: 
-            { varList = true;
+          case 15: 
+            { list.addLast(new Symbol("&&"));
             } 
             // fall through
           case 34: break;
-          case 17: 
-            { list.addLast(new BoolNode(yytext()));
+          case 16: 
+            { openInstructions.addFirst(new IfNode(line));
             } 
             // fall through
           case 35: break;
-          case 18: 
-            { openInstructions.addFirst(new WhileNode());
+          case 17: 
+            { varList = true;
             } 
             // fall through
           case 36: break;
+          case 18: 
+            { list.addLast(new BoolNode(line, yytext()));
+            } 
+            // fall through
+          case 37: break;
+          case 19: 
+            { openInstructions.addFirst(new WhileNode(line));
+            } 
+            // fall through
+          case 38: break;
           default:
             zzScanError(ZZ_NO_MATCH);
         }
