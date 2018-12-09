@@ -1,6 +1,7 @@
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.TreeMap;
@@ -28,9 +29,10 @@ public class Parser {
 
         writer = new PrintWriter("output", "UTF-8");
         TreeMap<VarNode, Integer> vars = l.interpret();
-        for (Map.Entry<VarNode, Integer> e : vars.entrySet()) {
-            String value = e.getValue() != null ? e.getValue().toString() : "null";
-            writer.println(e.getKey() + "=" + value);
+        LinkedList<VarNode> orderedVars = l.getOrderedVars();
+        for (VarNode v : orderedVars) {
+            Integer value = vars.get(v);
+            writer.println(v + "=" + value);
         }
         writer.close();
     }

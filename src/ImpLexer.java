@@ -251,6 +251,7 @@ class ImpLexer {
   private int zzFinalHighSurrogate = 0;
 
   /* user code: */
+    private LinkedList<VarNode> orderedVars = new LinkedList<>();
     private TreeMap<VarNode, Integer> vars = new TreeMap<>();
     private boolean varList = false;
     private BlockNode mainBlock = new BlockNode();
@@ -259,6 +260,11 @@ class ImpLexer {
 
     public MainNode getMain() {
         return new MainNode(mainBlock.getStmt());
+    }
+
+    // Get list of vars as originally initialised
+    public LinkedList<VarNode> getOrderedVars() {
+        return orderedVars;
     }
 
     public TreeMap<VarNode, Integer> interpret() {
@@ -729,10 +735,12 @@ class ImpLexer {
           case 19: break;
           case 2: 
             { VarNode var = new VarNode(yytext());
-            if (varList)
-                vars.put(var, null);
-            else
-                list.addLast(var);
+             if (varList) {
+                 vars.put(var, null);
+                 orderedVars.addLast(var);
+             } else {
+                 list.addLast(var);
+             }
              if (!vars.containsKey(var))
                  System.out.println("UnassignedVar");
             } 
