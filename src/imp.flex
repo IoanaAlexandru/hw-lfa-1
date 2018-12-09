@@ -6,7 +6,7 @@ import java.util.*;
 %line
 %int
 %{
-    private TreeSet<VarNode> vars = new TreeSet<>();
+    private TreeMap<VarNode, Integer> vars = new TreeMap<>();
     private boolean varList = false;
     private BlockNode mainBlock = new BlockNode();
     private LinkedList<InstructionNode> openInstructions = new LinkedList<>();
@@ -14,6 +14,11 @@ import java.util.*;
 
     public MainNode getMain() {
         return new MainNode(mainBlock.getStmt());
+    }
+
+    public TreeMap<VarNode, Integer> interpret() {
+        mainBlock.getStmt().interpret(vars);
+        return vars;
     }
 
     private Node buildStmt(List<Node> list) {
@@ -172,10 +177,10 @@ Int = "int"
 {Var}      {
              VarNode var = new VarNode(yytext());
             if (varList)
-                vars.add(var);
+                vars.put(var, null);
             else
                 list.addLast(var);
-             if (!vars.contains(var))
+             if (!vars.containsKey(var))
                  System.out.println("UnassignedVar");
            }
 .          {}

@@ -251,7 +251,7 @@ class ImpLexer {
   private int zzFinalHighSurrogate = 0;
 
   /* user code: */
-    private TreeSet<VarNode> vars = new TreeSet<>();
+    private TreeMap<VarNode, Integer> vars = new TreeMap<>();
     private boolean varList = false;
     private BlockNode mainBlock = new BlockNode();
     private LinkedList<InstructionNode> openInstructions = new LinkedList<>();
@@ -259,6 +259,11 @@ class ImpLexer {
 
     public MainNode getMain() {
         return new MainNode(mainBlock.getStmt());
+    }
+
+    public TreeMap<VarNode, Integer> interpret() {
+        mainBlock.getStmt().interpret(vars);
+        return vars;
     }
 
     private Node buildStmt(List<Node> list) {
@@ -725,10 +730,10 @@ class ImpLexer {
           case 2: 
             { VarNode var = new VarNode(yytext());
             if (varList)
-                vars.add(var);
+                vars.put(var, null);
             else
                 list.addLast(var);
-             if (!vars.contains(var))
+             if (!vars.containsKey(var))
                  System.out.println("UnassignedVar");
             } 
             // fall through
