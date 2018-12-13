@@ -28,12 +28,24 @@ public class Parser {
         writer.close();
 
         writer = new PrintWriter("output", "UTF-8");
-        TreeMap<VarNode, Integer> vars = l.interpret();
-        LinkedList<VarNode> orderedVars = l.getOrderedVars();
-        for (VarNode v : orderedVars) {
-            Integer value = vars.get(v);
-            writer.println(v + "=" + value);
+        int unassignedVarLine = l.getUnassignedVarLine();
+        if (unassignedVarLine > -1) {
+            writer.println("UnassignedVar " + unassignedVarLine);
+            writer.close();
+            return;
         }
-        writer.close();
+
+        try {
+            TreeMap<VarNode, Integer> vars = l.interpret();
+            LinkedList<VarNode> orderedVars = l.getOrderedVars();
+            for (VarNode v : orderedVars) {
+                Integer value = vars.get(v);
+                writer.println(v + "=" + value);
+            }
+        } catch (ImpException e) {
+            writer.println(e.getMsg());
+        } finally {
+            writer.close();
+        }
     }
 }

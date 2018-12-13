@@ -12,7 +12,8 @@ import java.util.*;
     private BlockNode mainBlock = new BlockNode();
     private LinkedList<InstructionNode> openInstructions = new LinkedList<>();
     private LinkedList<Node> list = new LinkedList<>();
-    int line = -1;
+    private int line = 1;
+    private int unassignedVarLine = -1;
 
     public MainNode getMain() {
         return new MainNode(line, mainBlock.getStmt());
@@ -23,7 +24,9 @@ import java.util.*;
         return orderedVars;
     }
 
-    public TreeMap<VarNode, Integer> interpret() {
+    public int getUnassignedVarLine() { return unassignedVarLine; }
+
+    public TreeMap<VarNode, Integer> interpret() throws ImpException {
         mainBlock.getStmt().interpret(vars);
         return vars;
     }
@@ -190,7 +193,7 @@ Int = "int"
                  list.addLast(var);
              }
              if (!vars.containsKey(var))
-                 System.out.println("UnassignedVar");
+                 unassignedVarLine = line;
            }
 .          {}
 

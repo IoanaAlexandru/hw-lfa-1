@@ -8,15 +8,15 @@ interface Node {
 }
 
 interface StmtNode extends Node {
-    void interpret(TreeMap<VarNode, Integer> vars);
+    void interpret(TreeMap<VarNode, Integer> vars) throws ImpException;
 }
 
 interface ANode extends Node {
-    Integer interpretA(TreeMap<VarNode, Integer> vars);
+    Integer interpretA(TreeMap<VarNode, Integer> vars) throws ImpException;
 }
 
 interface BNode extends Node {
-    Boolean interpretB(TreeMap<VarNode, Integer> vars);
+    Boolean interpretB(TreeMap<VarNode, Integer> vars) throws ImpException;
 }
 
 interface InstructionNode extends StmtNode {
@@ -66,7 +66,6 @@ class MainNode implements StmtNode {
     private StmtNode prog;
 
     public MainNode(int line, Node prog) {
-        // TODO check everywhere if parameters are instances of the right class before casting
         this.line = line;
         this.prog = (StmtNode) prog;
     }
@@ -77,7 +76,7 @@ class MainNode implements StmtNode {
     }
 
     @Override
-    public void interpret(TreeMap<VarNode, Integer> vars) {
+    public void interpret(TreeMap<VarNode, Integer> vars) throws ImpException {
         prog.interpret(vars);
     }
 
@@ -184,8 +183,10 @@ class VarNode implements ANode, Comparable {
     }
 
     @Override
-    public Integer interpretA(TreeMap<VarNode, Integer> vars) {
-        return vars.get(this);
+    public Integer interpretA(TreeMap<VarNode, Integer> vars) throws ImpException {
+        if (vars.containsKey(this) && vars.get(this) != null)
+            return vars.get(this);
+        throw new ImpException("UnassignedVar", line);
     }
 }
 
@@ -213,7 +214,7 @@ class PlusNode implements ANode {
     }
 
     @Override
-    public Integer interpretA(TreeMap<VarNode, Integer> vars) {
+    public Integer interpretA(TreeMap<VarNode, Integer> vars) throws ImpException {
         return aExpr1.interpretA(vars) + aExpr2.interpretA(vars);
     }
 }
@@ -242,8 +243,12 @@ class DivNode implements ANode {
     }
 
     @Override
-    public Integer interpretA(TreeMap<VarNode, Integer> vars) {
-        return aExpr1.interpretA(vars) / aExpr2.interpretA(vars);
+    public Integer interpretA(TreeMap<VarNode, Integer> vars) throws ImpException {
+        try {
+            return aExpr1.interpretA(vars) / aExpr2.interpretA(vars);
+        } catch (ArithmeticException e) {
+            throw new ImpException("DivideByZero", line);
+        }
     }
 }
 
@@ -267,14 +272,14 @@ class BracketNode implements ANode, BNode {
     }
 
     @Override
-    public Integer interpretA(TreeMap<VarNode, Integer> vars) {
+    public Integer interpretA(TreeMap<VarNode, Integer> vars) throws ImpException {
         if (expr instanceof ANode)
             return ((ANode) expr).interpretA(vars);
         return null;
     }
 
     @Override
-    public Boolean interpretB(TreeMap<VarNode, Integer> vars) {
+    public Boolean interpretB(TreeMap<VarNode, Integer> vars) throws ImpException {
         if (expr instanceof BNode)
             return ((BNode) expr).interpretB(vars);
         return null;
@@ -305,7 +310,7 @@ class AndNode implements BNode {
     }
 
     @Override
-    public Boolean interpretB(TreeMap<VarNode, Integer> vars) {
+    public Boolean interpretB(TreeMap<VarNode, Integer> vars) throws ImpException {
         return bExpr1.interpretB(vars) && bExpr2.interpretB(vars);
     }
 }
@@ -334,7 +339,7 @@ class GreaterNode implements BNode {
     }
 
     @Override
-    public Boolean interpretB(TreeMap<VarNode, Integer> vars) {
+    public Boolean interpretB(TreeMap<VarNode, Integer> vars) throws ImpException {
         return aExpr1.interpretA(vars) > aExpr2.interpretA(vars);
     }
 }
@@ -359,7 +364,7 @@ class NotNode implements BNode {
     }
 
     @Override
-    public Boolean interpretB(TreeMap<VarNode, Integer> vars) {
+    public Boolean interpretB(TreeMap<VarNode, Integer> vars) throws ImpException {
         return !bExpr.interpretB(vars);
     }
 }
@@ -388,7 +393,7 @@ class AssignmentNode implements StmtNode {
     }
 
     @Override
-    public void interpret(TreeMap<VarNode, Integer> vars) {
+    public void interpret(TreeMap<VarNode, Integer> vars) throws ImpException {
         vars.put(var, aExpr.interpretA(vars));
     }
 }
@@ -438,7 +443,7 @@ class BlockNode implements StmtNode {
     }
 
     @Override
-    public void interpret(TreeMap<VarNode, Integer> vars) {
+    public void interpret(TreeMap<VarNode, Integer> vars) throws ImpException {
         if (!stmts.isEmpty())
             getStmt().interpret(vars);
     }
@@ -531,7 +536,7 @@ class IfNode implements InstructionNode {
     }
 
     @Override
-    public void interpret(TreeMap<VarNode, Integer> vars) {
+    public void interpret(TreeMap<VarNode, Integer> vars) throws ImpException {
         if (condition.interpretB(vars))
             ifBlock.interpret(vars);
         else
@@ -610,7 +615,7 @@ class WhileNode implements InstructionNode {
     }
 
     @Override
-    public void interpret(TreeMap<VarNode, Integer> vars) {
+    public void interpret(TreeMap<VarNode, Integer> vars) throws ImpException {
         while (condition.interpretB(vars))
             block.interpret(vars);
     }
@@ -642,7 +647,7 @@ class SequenceNode implements StmtNode {
     }
 
     @Override
-    public void interpret(TreeMap<VarNode, Integer> vars) {
+    public void interpret(TreeMap<VarNode, Integer> vars) throws ImpException {
         stmt1.interpret(vars);
         stmt2.interpret(vars);
     }
