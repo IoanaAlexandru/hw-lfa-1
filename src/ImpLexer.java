@@ -251,15 +251,24 @@ class ImpLexer {
   private int zzFinalHighSurrogate = 0;
 
   /* user code: */
+    // variables in the order they were initialised in
     private LinkedList<VarNode> orderedVars = new LinkedList<>();
+    // variable names associated with their respective values
     private TreeMap<VarNode, Integer> vars = new TreeMap<>();
+    // true if parser is currently initialising the varList
     private boolean varList = false;
+    // the whole program is essentially a block - the main() block
     private BlockNode mainBlock = new BlockNode();
+    // stack of instructions that are currently "open" (still being parsed)
     private LinkedList<InstructionNode> openInstructions = new LinkedList<>();
+    // list of Nodes that have to be parsed
     private LinkedList<Node> list = new LinkedList<>();
-    int line = 1;
-    int unassignedVarLine = -1;
+    // line count
+    private int line = 1;
+    // if an unassigned variable is found, this integer is set to its line and parsing continues
+    private int unassignedVarLine = -1;
 
+    // Get main statement
     public MainNode getMain() {
         return new MainNode(line, mainBlock.getStmt());
     }
@@ -269,16 +278,18 @@ class ImpLexer {
         return orderedVars;
     }
 
+    // Get first line where an unassigned variable was found; returns -1 if all variables were assigned
     public int getUnassignedVarLine() { return unassignedVarLine; }
 
+    // Interpret main statement and assign values to variables
     public TreeMap<VarNode, Integer> interpret() throws ImpException {
         mainBlock.getStmt().interpret(vars);
         return vars;
     }
 
+    // Build statement from list of Nodes, minding operator precedence
+    // () -> ! -> / -> + -> > -> && -> =
     private Node buildStmt(List<Node> list) {
-        // Mind operator precedence
-
         // Brackets
         Symbol openSym = new Symbol("(");
         Symbol closeSym = new Symbol(")");

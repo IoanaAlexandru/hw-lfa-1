@@ -8,7 +8,7 @@ class ImpException extends IOException {
         msg = type + " " + line;
     }
 
-    public String getMsg() {
+    String getMsg() {
         return msg;
     }
 }

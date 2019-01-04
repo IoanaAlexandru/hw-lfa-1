@@ -2,23 +2,29 @@ import java.util.LinkedList;
 import java.util.TreeMap;
 
 interface Node {
+    // Print this node to stdout
     String show();
 
+    // Get line where this node is defined in the code
     int getLine();
 }
 
+// Statement node - its interpretation returns nothing but might change the value associated with a variable
 interface StmtNode extends Node {
     void interpret(TreeMap<VarNode, Integer> vars) throws ImpException;
 }
 
+// Arithmetic node - its interpretation returns an integer
 interface ANode extends Node {
     Integer interpretA(TreeMap<VarNode, Integer> vars) throws ImpException;
 }
 
+// Boolean node - its interpretation returns a boolean
 interface BNode extends Node {
     Boolean interpretB(TreeMap<VarNode, Integer> vars) throws ImpException;
 }
 
+// Node containing blocks of instructions and a condition
 interface InstructionNode extends StmtNode {
     void openBlock();
 
@@ -26,11 +32,14 @@ interface InstructionNode extends StmtNode {
 
     void setCondition(Node condition);
 
+    // Add statement in the last opened block
     void addStmt(Node stmt);
 
+    // Returns true if all necessary blocks were defined (opened and closed)
     boolean done();
 }
 
+// Auxiliary node that helps with parsing; will be converted to another node when parsing
 class Symbol implements Node {
     private String symbol;
 
@@ -398,6 +407,8 @@ class AssignmentNode implements StmtNode {
     }
 }
 
+
+// A block contains multiple statements, which can all be represented through a SequenceNode
 class BlockNode implements StmtNode {
     private int line;
     private LinkedList<StmtNode> stmts = new LinkedList<>();
@@ -408,6 +419,8 @@ class BlockNode implements StmtNode {
         stmts.addFirst((StmtNode) stmt);
     }
 
+
+    // Get sequence containing all statements in the block
     StmtNode getStmt() {
         LinkedList<StmtNode> copy = (LinkedList<StmtNode>) stmts.clone();
         StmtNode stmt = getStmtAux();
@@ -423,6 +436,7 @@ class BlockNode implements StmtNode {
         return buildSequence();
     }
 
+    // Recursively build sequence out of the statements in the block
     private StmtNode buildSequence() {
         StmtNode node = stmts.removeLast();
         if (stmts.isEmpty())
